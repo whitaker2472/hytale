@@ -1,25 +1,9 @@
 #!/usr/bin/env bash
-# Official-style Proxmox LXC Creator for Hytale
+# Source the helper library
+source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
 
-# UPDATED SOURCE LINK
-#source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
-
-# If the above still fails, it means curl is failing. 
-# We add this check to stop the script if the library isn't loaded.
-#if [[ -z "$FUNCTIONS_FILE_PATH" ]]; then
-#  echo "Error: Could not load helper functions. Check your internet connection."
-#  exit 1
-#fi
-
-#color
-#header_info
-#!/usr/bin/env bash
-# Official-style Proxmox LXC Creator for Hytale
-#source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
-#color
-#header_info
-
-# Default Settings
+# Set the LXC Variables
+APP="Hytale"
 var_os="debian"
 var_version="12"
 var_cpu="2"
@@ -27,22 +11,28 @@ var_ram="10240"
 var_disk="32"
 var_unprivileged="1"
 
-# Container description
-APP="Hytale-Server"
-
+# This function is required by the helper library
 function update_script() {
-  header_info
-  msg_info "Updating Hytale Server"
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/whitaker2472/hytale/refs/heads/main/install_hytale.sh)"
-  msg_ok "Updated Successfully"
-  exit
+    header_info
+    msg_info "Updating Hytale Server"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/whitaker2472/hytale/main/hytaleinstall.sh)"
+    msg_ok "Updated Successfully"
+    exit
 }
 
+# 1. Run the Proxmox Branding and Checks
+header_info
+check_root
+
+# 2. Start the LXC Creation process
+# This will ask you for Storage, ID, etc.
 start_script
 
-# --- CPU Optimization Section ---
-# This runs on the Proxmox Host after the container is created
-#msg_info "Optimizing CPU Type to 'host'"
-# $CTID is a variable provided by the Proxmox script library
-#pct set $CTID --cpuunit 1024 --cpulimit $var_cpu --cpu host
-#msg_ok "CPU Optimized for Java Performance"
+# 3. Post-Creation Optimization (Runs on the Host)
+msg_info "Optimizing CPU Type to 'host'"
+# $CTID is automatically set by start_script
+pct set $CTID -cpu host
+msg_ok "CPU Optimized"
+
+# 4. Finish
+exit_script
