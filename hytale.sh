@@ -2,17 +2,17 @@
 # Official-style Proxmox LXC Creator for Hytale
 
 # UPDATED SOURCE LINK
-source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
+#source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
 
 # If the above still fails, it means curl is failing. 
 # We add this check to stop the script if the library isn't loaded.
-if [[ -z "$FUNCTIONS_FILE_PATH" ]]; then
-  echo "Error: Could not load helper functions. Check your internet connection."
-  exit 1
-fi
+#if [[ -z "$FUNCTIONS_FILE_PATH" ]]; then
+#  echo "Error: Could not load helper functions. Check your internet connection."
+#  exit 1
+#fi
 
-color
-header_info
+#color
+#header_info
 #!/usr/bin/env bash
 # Official-style Proxmox LXC Creator for Hytale
 #source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
