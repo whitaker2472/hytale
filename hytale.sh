@@ -18,7 +18,7 @@ APP="Hytale-Server"
 function update_script() {
   header_info
   msg_info "Updating Hytale Server"
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USER/YOUR_REPO/main/install_hytale.sh)"
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/whitaker2472/hytale/refs/heads/main/install_hytale.sh)"
   msg_ok "Updated Successfully"
   exit
 }
