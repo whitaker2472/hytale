@@ -1,38 +1,31 @@
-#!/usr/bin/env bash
-# Source the helper library
-source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lib/functions.sh)
+sudo -u hytale bash <<EOF
+cd /opt/hytale
+wget -q https://hytale.com/downloads/hytale-downloader.zip
+unzip -q hytale-downloader.zip
+chmod +x hytale-downloader
+EOF
 
-# Set the LXC Variables
-APP="Hytale"
-var_os="debian"
-var_version="12"
-var_cpu="2"
-var_ram="10240"
-var_disk="32"
-var_unprivileged="1"
+# 5. Set Firewall (UDP for Hytale/QUIC)
+if command -v ufw >/dev/null; then
+  ufw allow 5520/udp
+fi
 
-# This function is required by the helper library
-function update_script() {
-    header_info
-    msg_info "Updating Hytale Server"
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/whitaker2472/hytale/main/hytaleinstall.sh)"
-    msg_ok "Updated Successfully"
-    exit
-}
+# 6. Create the Systemd Service
+cat <<EOF >/etc/systemd/system/hytale.service
+[Unit]
+Description=Hytale Dedicated Server
+After=network-online.target
 
-# 1. Run the Proxmox Branding and Checks
-header_info
-check_root
+[Service]
+Type=simple
+User=hytale
+WorkingDirectory=/opt/hytale
+ExecStart=/usr/bin/java -Xmx8G -Xms8G -XX:+UseG1GC -jar HytaleServer.jar --assets Assets.zip
+Restart=on-failure
+RestartSec=10
 
-# 2. Start the LXC Creation process
-# This will ask you for Storage, ID, etc.
-start_script
+[Install]
+WantedBy=multi-user.target
+EOF
 
-# 3. Post-Creation Optimization (Runs on the Host)
-msg_info "Optimizing CPU Type to 'host'"
-# $CTID is automatically set by start_script
-pct set $CTID -cpu host
-msg_ok "CPU Optimized"
-
-# 4. Finish
-exit_script
+systemctl daemon-reload
